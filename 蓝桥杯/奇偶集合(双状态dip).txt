@@ -1,0 +1,73 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{
+	public static void main(String[] args) throws IOException
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int t=Integer.parseInt(tokenizer.nextToken());
+		for(int i=0;i<t;i++)
+		{
+			StringTokenizer t1=new StringTokenizer(reader.readLine());
+			int n=Integer.parseInt(t1.nextToken());
+			int[] numbers=new int[n+1];
+			int sum=0;
+			StringTokenizer t2=new StringTokenizer(reader.readLine());
+			for(int j=1;j<=n;j++)
+			{
+				numbers[j]=Integer.parseInt(t2.nextToken());
+				sum+=numbers[j];
+			}
+			if(sum%2!=0)//至少要选出两个偶数的集合 所以总的和一定是偶数 
+			{
+				System.out.println(0);
+				continue;
+			}
+			long[] dp1=new long[n+1];//dp1[i]表示前i个元素中和为偶数的集合数量
+			long[] dp2=new long[n+1];//dp2[i]表示前i个元素中和为奇数的集合数量
+			dp1[0]=1;//空集算偶数 
+			dp2[0]=0;
+			for(int k=1;k<=n;k++)
+			{
+				//当前数为偶数
+				if(numbers[k]%2==0)
+				{
+					//合并到dp1[k-1]的任何一个和中 或者不选自己
+					dp1[k]=(2*dp1[k-1])%1000000007;
+					//合并到dp2[k-1]的任何一个(这里面已经包括了空集) 或者不选自己
+					dp2[k]=(2*dp2[k-1])%1000000007;
+				}
+				//当前数为奇数
+				else
+				{
+					//与dp1[k-1]的任意一个合并都为奇数(奇+偶=奇) 再加上不选自己
+					dp2[k]=(dp2[k-1]+dp1[k-1])%1000000007;
+					//与dp2[k-1]的任意一个合并都为偶数 再加上不选自己
+					dp1[k]=(dp1[k-1]+dp2[k-1])%1000000007;
+				}
+			}
+			System.out.println(dp1[n]);
+		}
+	}
+}
+	
+	
+	
+	
+
