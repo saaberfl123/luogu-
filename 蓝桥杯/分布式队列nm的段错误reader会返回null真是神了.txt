@@ -1,0 +1,81 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{
+	public static class node
+	{
+		int[] data;
+		int index=0;
+		node()
+		{
+			this.data=new int[5000];
+		}
+	}
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		node[] nodes=new node[n+1];
+		int[] isSeem=new int[5000];
+		for(int i=0;i<=n;i++)nodes[i]=new node();
+		for(int i=0;i<2000;i++)
+		{
+			String line=reader.readLine();
+			if(line==null)break;
+			StringTokenizer t=new StringTokenizer(line);
+			String method=t.nextToken();
+			if(method.equals("add"))
+			{
+				int number=Integer.parseInt(t.nextToken());
+				nodes[0].data[nodes[0].index++]=number;
+			}
+			if(method.equals("sync"))
+			{
+				int k=Integer.parseInt(t.nextToken());
+				if(nodes[k].index<nodes[0].index)
+				{
+					nodes[k].data[nodes[k].index]=nodes[0].data[nodes[k].index];
+					isSeem[nodes[k].index]++;
+					nodes[k].index++;
+				}
+			}
+			if(method.equals("query"))
+			{
+				int max=0;
+				for(int j=0;j<nodes[0].index;j++)
+				{
+					if(isSeem[j]>=n-1)
+						max++;
+				}
+				System.out.println(max);
+			}
+		}
+		
+		
+	}
+	
+}
+	
+	
+	
+	
+
