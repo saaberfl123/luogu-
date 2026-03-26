@@ -1,0 +1,112 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{	
+	public static class edge
+    {
+        int from;int to;double dis;
+        edge(int from,int to,double dis){this.from=from;this.to=to;this.dis=dis;}
+    }
+    
+    public static class circle
+    {
+        int x;int y;int r;
+        circle(int x,int y,int r){this.x=x;this.y=y;this.r=r;}
+    }
+
+	public static int[] parents;
+	
+	public static int findRoot(int index)
+	{
+		int root=index;
+		while(parents[root]!=root)root=parents[root];
+		while(parents[index]!=index)
+		{
+			int parent=parents[index];
+			parents[index]=root;
+			index=parent;
+		}
+		return root;//路径压缩 其实还能递归 一般就是递归
+	}
+	
+	public static void union(int a,int b)
+	{
+		int rootA=findRoot(a);
+		int rootB=findRoot(b);
+		if(rootB!=rootA)parents[rootB]=rootA;
+	}
+	
+	
+	public static ArrayList<edge> edges;
+	public static double Kruscal(int n)
+	{
+		
+		int count=0;
+		double sum=0;
+		for(edge nowEdge: edges)
+		{
+			if(count>=n-1)break;
+			if(findRoot(nowEdge.from)!=findRoot(nowEdge.to))
+			{
+				count++;
+				sum+=nowEdge.dis;
+				union(nowEdge.from,nowEdge.to);
+			}
+		}
+		
+		return sum;
+		
+	}
+	
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+        int n=Integer.parseInt(tokenizer.nextToken());
+        circle[] c=new circle[n+1];
+        edges=new ArrayList<>();
+        parents=new int[n+1];
+        for(int i=0;i<n;i++)parents[i]=i;
+        for(int i=0;i<n;i++)
+        {
+        	StringTokenizer t=new StringTokenizer(reader.readLine());
+            c[i]=new circle(Integer.parseInt(t.nextToken()),Integer.parseInt(t.nextToken()),Integer.parseInt(t.nextToken()));
+        }
+        for(int i=0;i<n;i++)
+        {
+            for(int j=i+1;j<n;j++)
+            {
+                double dis=Math.sqrt(Math.pow(c[i].x-c[j].x,2)+Math.pow(c[i].y-c[j].y, 2));
+                if(dis<=c[i].r+c[j].r)dis=0;
+                else dis-=(c[i].r+c[j].r);
+                edges.add(new edge(i,j, dis));
+            }
+        }
+        edges.sort((a,b)->Double.compare(a.dis, b.dis));
+		System.out.printf("%.2f",Kruscal(n));
+	}
+		
+	
+		
+		
+		
+}傻逼蓝桥杯这么多数据给256内存是不是脑子有坑 这个代码仅仅能得70的得分 但是这就是Kruscal的最佳代码

@@ -1,0 +1,112 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{	
+	public static int[] next;//next[i]表示以next[i]元素结尾的序列的最长相同前缀字串和后缀字串的长度
+	
+	public static char[] S1;//小串
+	
+	public static char[] S2;//文本串
+	
+	public static PrintWriter writer=new PrintWriter(new OutputStreamWriter(System.out));
+	
+		
+	public static void build_next()
+	{
+		//维护两个指针i j  
+		//如果S1[i]==S1[j] 说明有匹配的 那么next[j]=i+1
+		//如果S1[i]!=S1[j] 说明这个字母不匹配 就回退i指针 再次比对 若匹配则next[j]=i+1 不匹配就为0 
+		//i前缀 j后缀
+		next[0]=0;
+		int i=0;
+		for(int j=1;j<S1.length;j++)
+		{
+			//当前字符不匹配 前缀回退
+			while(i>0&&S1[i]!=S1[j])
+			{
+				i=next[i-1];
+			}
+			if(S1[i]==S1[j])//找到相等的
+			{
+				i++;
+				next[j]=i;
+			}
+			else next[j]=0;//完全没找到相等的就没了
+			
+		}
+	}
+	
+	public static void KMP() throws IOException
+	{
+		int i=0;//小串
+		int j=0;//大串
+		while(true)
+		{
+			//找到匹配了
+			if(i>S1.length-1)
+			{
+				writer.println(j-i+1);
+				i=next[i-1];//依旧接后缀
+			}
+			if(j>=S2.length)break;
+			if(S1[i]==S2[j])
+			{
+				i++;
+				j++;
+			}
+			else //有不等的元素 此时子串走到i位置 模板串走到j位置
+			{
+				//i-1之前的位置都是等的
+				if(i>0)
+				{
+					//下一次比对从小串的前缀后第一个 大串的后缀后第一个开始  把前缀接到原串相同的后缀上
+					//从相同的下一个元素进行比较
+					i=next[i-1];
+				}
+				else 
+				{
+					//如果第一个串就不匹配 那自然让文本串往下走了
+					j++;
+				}
+			}			
+		}
+		writer.flush();
+	}	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		String s2=reader.readLine();
+		String s1=reader.readLine();
+		S1=s1.toCharArray();
+		S2=s2.toCharArray();
+		next=new int[S1.length];
+		build_next();
+		KMP();	
+		Arrays.stream(next).forEach((a)->System.out.print(a+" "));
+	}
+		
+	
+		
+		
+		
+}
