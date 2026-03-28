@@ -1,112 +1,73 @@
-import java.awt.List;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
-
 public class Main 
 {	
-	public static int[] next;//next[i]表示以next[i]元素结尾的序列的最长相同前缀字串和后缀字串的长度
+	//KMP
+	//鉴于3.25写的代码太难看了 遂3.26再写一次加深印象
+	public static char[] S1;//长串
 	
-	public static char[] S1;//小串
+	public static char[] S2;//短串
 	
-	public static char[] S2;//文本串
+	public static int[] next;//next[i] 表示以第i个元素结尾的子串 其最长相同前后缀
 	
 	public static PrintWriter writer=new PrintWriter(new OutputStreamWriter(System.out));
 	
-		
-	public static void build_next()
+	
+	public static void buildNext(int n)
 	{
-		//维护两个指针i j  
-		//如果S1[i]==S1[j] 说明有匹配的 那么next[j]=i+1
-		//如果S1[i]!=S1[j] 说明这个字母不匹配 就回退i指针 再次比对 若匹配则next[j]=i+1 不匹配就为0 
-		//i前缀 j后缀
 		next[0]=0;
 		int i=0;
-		for(int j=1;j<S1.length;j++)
+		for(int j=1;j<n;j++)
 		{
-			//当前字符不匹配 前缀回退
-			while(i>0&&S1[i]!=S1[j])
+			//j是后缀指针 j是不能回退的
+			//当 当前i j所指元素不同时 前缀回退 找找看是否有相同的情况 (有可能是更短的串 不能从0开始 这样复杂度就起飞了)
+			//每次比较的都是确定相同的串的后面一个元素 减少比较量
+			while(i>0&&S2[j]!=S2[i])
 			{
-				i=next[i-1];
+				i=next[i-1];//回退到上一个字串的前缀末尾
 			}
-			if(S1[i]==S1[j])//找到相等的
+			if(S2[j]==S2[i])//如果找到了有相同的
 			{
-				i++;
-				next[j]=i;
+				i++;//字串长度+1
 			}
-			else next[j]=0;//完全没找到相等的就没了
-			
+			//如果没找到那就是0
+			next[j]=i;
 		}
 	}
 	
 	public static void KMP() throws IOException
 	{
-		int i=0;//小串
-		int j=0;//大串
+		int i=0;//长串
+		int j=0;//短串
 		while(true)
 		{
-			//找到匹配了
-			if(i>S1.length-1)
+			if(j>=S2.length)//如果j走到末尾了表示匹配成功
 			{
-				writer.println(j-i+1);
-				i=next[i-1];//依旧接后缀
+				writer.println(i-j+1);//开始的位置
+				j=next[j-1];//回溯到前缀后一个				
 			}
-			if(j>=S2.length)break;
-			if(S1[i]==S2[j])
+			if(i>=S1.length)break;
+			if(S1[i]==S2[j])//相等就继续走
 			{
 				i++;
 				j++;
 			}
-			else //有不等的元素 此时子串走到i位置 模板串走到j位置
+			else 
 			{
-				//i-1之前的位置都是等的
-				if(i>0)
-				{
-					//下一次比对从小串的前缀后第一个 大串的后缀后第一个开始  把前缀接到原串相同的后缀上
-					//从相同的下一个元素进行比较
-					i=next[i-1];
-				}
-				else 
-				{
-					//如果第一个串就不匹配 那自然让文本串往下走了
-					j++;
-				}
-			}			
-		}
+				if(j>0)j=next[j-1];//j一直回退 试图寻找相同的前缀的情况下所指的元素又相同的情况
+				else i++;//如果第一个元素都不匹配 i就得++了
+			}
+		}	
 		writer.flush();
-	}	
+	}
 	public static void main(String[] args) throws IOException 
 	{
 		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
-		String s2=reader.readLine();
-		String s1=reader.readLine();
-		S1=s1.toCharArray();
-		S2=s2.toCharArray();
-		next=new int[S1.length];
-		build_next();
-		KMP();	
-		Arrays.stream(next).forEach((a)->System.out.print(a+" "));
+		String s1=reader.readLine();S1=s1.toCharArray();
+		String s2=reader.readLine();S2=s2.toCharArray();
+		next =new int[s2.length()];
+		buildNext(s2.length());
+		KMP();
+		Arrays.stream(next).forEach((a)->writer.print(a+" "));
+		writer.flush();
 	}
-		
-	
-		
-		
 		
 }

@@ -1,0 +1,64 @@
+public class Main 
+{	
+	//关键路径 最长路径 拓扑排序
+	
+	public static long[] dist;//到开始点的距离
+	
+	public static ArrayList<long[]>[] map; //long[0] to long[1] dis;
+	
+	public static int[] indgree;//入度
+	
+	public static void typoSort(int n)
+	{
+		Queue<Integer> queue=new LinkedBlockingDeque<>();
+		for(int i=1;i<=n;i++)if(indgree[i]==0)queue.offer(i);
+		dist[1]=0;
+		while(!queue.isEmpty())
+		{
+			int node=queue.poll();
+			for(long[] edge:map[node])
+			{
+				int to=(int)edge[0];
+				long dis=edge[1];
+				if(dist[to]<dis+dist[node])
+					dist[to]=dis+dist[node];
+				indgree[to]--;
+				if(indgree[to]==0)queue.offer(to);
+			}	
+		}
+		
+	}
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		int m=Integer.parseInt(tokenizer.nextToken());
+		dist=new long[n+1];
+		Arrays.fill(dist,-200000000);
+		map=new ArrayList[n+1];
+		indgree=new int[n+1];
+		for(int i=1;i<=n;i++)map[i]=new ArrayList<>();
+		for(int i=0;i<m;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			int from=Integer.parseInt(t.nextToken());
+			long to=Long.parseLong(t.nextToken());
+			long dis=Long.parseLong(t.nextToken());
+			if(from!=to)
+			{
+				map[from].add(new long[] {to,dis});
+				indgree[(int)to]++;
+			}
+		}
+		typoSort(n);
+		if(dist[n]==-200000000)System.out.println(-1);
+		else System.out.println(dist[n]);
+		
+		
+		
+	}
+		
+}

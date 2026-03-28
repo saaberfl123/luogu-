@@ -1,0 +1,109 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{	
+	//Kruscal 模板
+		
+	public static class edge
+	{
+		int from;int to; int dis;
+		edge(int from,int to,int dis)
+		{
+			this.from=from;
+			this.to=to;
+			this.dis=dis;
+		}
+	}
+	
+	public static ArrayList<edge> edges;
+		
+	public static int[] parents;
+	
+	public static int findRoot(int index)
+	{
+		if(parents[index]==index)return index;
+		parents[index]=findRoot(parents[index]);
+		return parents[index];	
+	}
+	
+	public static void union(int rootA,int rootB)
+	{
+		parents[rootB]=rootA;
+	}
+	
+	public static int Kruscal(int n)
+	{
+		int count=0;
+		int sum=0;
+		for(edge nowEdge : edges)
+		{
+			if(count>=n-1)break;
+			int rootFrom=findRoot(nowEdge.from);
+			int rootTo=findRoot(nowEdge.to);
+			if(rootFrom!=rootTo)
+			{
+				sum+=nowEdge.dis;
+				count++;
+				union(rootFrom, rootTo);
+			}
+		}
+		
+		if(count<n-1)return -1;
+		return sum;
+	}
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int N=Integer.parseInt(tokenizer.nextToken());
+		int M=Integer.parseInt(tokenizer.nextToken());
+		edges=new ArrayList<>();
+		parents=new int[N+1];
+		for(int i=1;i<=N;i++)parents[i]=i;
+		for(int i=0;i<M;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			int from=Integer.parseInt(t.nextToken());
+			int to=Integer.parseInt(t.nextToken());
+			int dis=Integer.parseInt(t.nextToken());
+			if(from!=to)
+			{
+				edges.add(new edge(from, to, dis));
+				edges.add(new edge(to, from, dis));
+			}
+		}
+		edges.sort((a,b)->Integer.compare(a.dis,b.dis));
+		int ans=Kruscal(N);
+		if(ans==-1)System.out.println("orz");
+		else System.out.println(ans);
+	}
+	
+	
+	
+	
+	
+	
+		
+}

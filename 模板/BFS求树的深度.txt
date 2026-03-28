@@ -1,0 +1,61 @@
+public class Main 
+{
+	public static class node
+	{
+		int left;
+		int right;
+		int depth=1;
+		public node(int left,int right) 
+		{
+			this.left=left;this.right=right;
+		}
+	}
+	public static node[] nodes;
+	public static int findDepth(int root)
+	{
+		if(nodes[root]==null)return 0;
+		Queue<Integer> queue=new LinkedBlockingDeque<>();
+		queue.offer(root);
+		int max=1;
+		while(!queue.isEmpty())
+		{
+			node nowNode=nodes[queue.poll()];
+			if(max<nowNode.depth)max=nowNode.depth;
+			if(nodes[nowNode.left]!=null)
+			{
+				queue.offer(nowNode.left);
+				nodes[nowNode.left].depth=nowNode.depth+1;
+			}
+			if(nodes[nowNode.right]!=null)
+			{
+				queue.offer(nowNode.right);
+				nodes[nowNode.right].depth=nowNode.depth+1;
+			}
+		}
+		return max;
+	}
+	
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		nodes=new node[n+1]; 
+		for(int i=1;i<=n;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			int left=Integer.parseInt(t.nextToken());
+			int right=Integer.parseInt(t.nextToken());
+			nodes[i]=new node(left, right);
+		}
+		System.out.println(findDepth(1));
+		
+	}
+}
+	
+	
+	
+	
+

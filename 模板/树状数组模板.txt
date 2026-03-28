@@ -1,0 +1,75 @@
+public class Main 
+{	
+	public static int[] TreeList;
+	
+	public static int lowBit(int n)
+	{
+		return n&(-n);
+	}
+	
+	
+	public static void add(int x,int k,int n)
+	{
+		int parent=x;
+		while(parent<=n)
+		{
+			TreeList[parent]+=k;
+			parent=parent+lowBit(parent);
+		}
+	}
+	
+	public static int ask(int x)
+	{
+		int PreIndex=x;
+		int sum=0;
+		while(PreIndex>0)
+		{
+			sum+=TreeList[PreIndex];
+			PreIndex-=lowBit(PreIndex);
+		}
+		return sum;
+	}
+	
+	
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int N=Integer.parseInt(tokenizer.nextToken());
+		int M=Integer.parseInt(tokenizer.nextToken());
+		PrintWriter writer=new PrintWriter(new OutputStreamWriter(System.out));
+		TreeList=new int[N+1];
+		StringTokenizer t=new StringTokenizer(reader.readLine());
+		for(int i=1;i<=N;i++)
+		{
+			int number=Integer.parseInt(t.nextToken());
+			add(i, number,N);
+		}
+		
+		for(int i=1;i<=M;i++)
+		{
+			StringTokenizer t1=new StringTokenizer(reader.readLine());
+			int method=Integer.parseInt(t1.nextToken());
+			if(method==1)
+			{
+				int x=Integer.parseInt(t1.nextToken());
+				int k=Integer.parseInt(t1.nextToken());
+				add(x, k, N);
+			}
+			if(method==2)
+			{
+				int x=Integer.parseInt(t1.nextToken());
+				int y=Integer.parseInt(t1.nextToken());
+				writer.println(ask(y)-ask(x-1));
+			}
+		}
+		writer.flush();
+		
+	}
+	
+}
+	
+	
+	
+	
+

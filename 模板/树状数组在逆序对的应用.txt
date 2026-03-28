@@ -1,0 +1,61 @@
+public class Main 
+{	
+	//逆序对
+	
+	//树状数组实现的是区间查找(前缀和) 定点修改
+	public static int lowbit(int x) {return x&-x;}
+	
+	public static int[] bit;
+	//bit[i] 表示  [i-lowbit(i)+1,i]的和 lowbit实际就是层数 因此叫做树状数组
+	
+	public static void add(int x,int k)
+	{
+		while(x<=bit.length)
+		{
+			bit[x]+=k;
+			x+=lowbit(x);//管他的数组在上层 右边才能包括左边
+		}
+	}
+		
+	public static int ask(int x)
+	{
+		int sum=0;
+		while(x>0)
+		{
+			//求1~3 [3,3] [1~2] [0]退出
+			sum+=bit[x];
+			x-=lowbit(x);
+		}
+		return sum;
+	}
+		
+	public static void main(String[] args) throws IOException
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		bit=new int[n+1];
+		int[] temp=new int[n+1];
+		int[] number=new int[n+1];
+		StringTokenizer t=new StringTokenizer(reader.readLine());
+		int sum=0;
+		for(int i=1;i<=n;i++)
+		{
+			int k=Integer.parseInt(t.nextToken());
+			temp[i]=k;
+		}
+		//离散化操作
+		int[] temp1=Arrays.stream(temp).sorted().distinct().toArray();
+		for(int i=1;i<=n;i++)number[i]=Arrays.binarySearch(temp1,temp[i]);//java自带的二分搜索 非常好用
+		for(int i=1;i<=n;i++)
+		{
+			//之前插入的肯定比后插入的下标小
+			//所以只用找之前插入的元素中比当前元素大即可 但是这样找非常麻烦 不符合树状数组找前缀和
+			//所以转换 找之前插入元素比当前元素小的情况 再用全部情况减去即可
+			sum+=(i-1)-ask(number[i]);
+			add(number[i],1);
+		}
+		System.out.println(sum);
+	}
+		
+}
