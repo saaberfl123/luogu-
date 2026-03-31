@@ -1,0 +1,78 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.Buffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Main 
+{
+	public static void main(String[] args) throws IOException 
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());//钱
+		int m=Integer.parseInt(tokenizer.nextToken());//数量
+		ArrayList<Integer>[] items=new ArrayList[m+1];
+		int[] money=new int[m+1];
+		int[] important=new int[m+1];
+		int[] parents=new int[m+1];
+		for(int i=0;i<=m;i++)
+		{
+			items[i]=new ArrayList<>();
+			parents[i]=i;
+		}
+		for(int i=1;i<=m;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			int M=Integer.parseInt(t.nextToken());
+			int I=Integer.parseInt(t.nextToken());
+			int parent=Integer.parseInt(t.nextToken());
+			money[i]=M;
+			important[i]=I;
+			if(parent!=0)
+			{
+				parents[i]=parent;
+				items[parent].add(i);
+			}
+		}
+		for(int i=1;i<=m;i++)
+		{
+			while(items[i].size()<2)items[i].add(0);
+		}
+		int[] dp=new int[n+1];
+		for(int i=1;i<=m;i++)
+		{
+			if(parents[i]!=i)continue;//排除子节点的可能
+			//核心 分组分别处理一次内部比较 最后统一赋值
+			for(int j=n;j>=money[i];j--)
+			{
+				int maxVal=0;
+				int M0=money[items[i].get(0)];
+				int I0=important[items[i].get(0)];
+				int M1=money[items[i].get(1)];
+				int I1=important[items[i].get(1)];
+				int basic=money[i]*important[i]+dp[j-money[i]];//选一个
+				if(j>=M0+money[i])maxVal=Math.max(dp[j-M0-money[i]]+M0*I0+money[i]*important[i],maxVal);//选第一个
+				if(j>=M1+money[i])maxVal=Math.max(dp[j-M1-money[i]]+M1*I1+money[i]*important[i],maxVal);//选第二个
+				if(j>=M0+M1+money[i])maxVal=Math.max(dp[j-M0-M1-money[i]]+M0*I0+M1*I1+money[i]*important[i],maxVal);//全选
+				maxVal=Math.max(basic,maxVal);
+				dp[j]=Math.max(maxVal,dp[j]);//不选这组 和选了这组的最优情况
+			}
+			
+		
+		}
+		System.out.println(dp[n]);
+	
+		
+		
+	}
+	
+	
+	
+	
+	
+}

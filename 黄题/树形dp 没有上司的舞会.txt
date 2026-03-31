@@ -1,0 +1,94 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{	
+	//树形dp
+	
+	public static ArrayList<Integer>[] tree;//发现了吗 树就是图的特例
+	
+	public static int[][] dp;//dp[i][0]表示以i为根的子树 并且不选i的最大欢乐值
+							 //dp[i][1]表示以i为根的子树 并且选i的最大欢乐值
+	public static int[] happy;
+	
+	public static int[] parents;
+	 
+	public static void dfs(int index)
+	{
+		dp[index][0]=0;
+		dp[index][1]=happy[index];
+		
+		for(int child : tree[index])
+		{
+			//递归到叶子节点
+			dfs(child);//先递归后加才有意义 因为后面的都处理了
+			dp[index][0]+=Math.max(dp[child][0],dp[child][1]);
+			dp[index][1]+=dp[child][0];//选了这个后面就选不了哦
+		}
+		
+	}
+	
+	
+	
+	
+	
+	public static void main(String[] args) throws IOException
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		tree=new ArrayList[n+1];
+		dp=new int[n+1][2];
+		happy=new int[n+1];
+		parents=new int[n+1];
+		for(int i=1;i<=n;i++)tree[i]=new ArrayList<>();
+		for(int i=1;i<=n;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			happy[i]=Integer.parseInt(t.nextToken());
+		}
+		for(int i=1;i<=n-1;i++)
+		{
+			StringTokenizer t1=new StringTokenizer(reader.readLine());
+			int child=Integer.parseInt(t1.nextToken());
+			int parent=Integer.parseInt(t1.nextToken());
+			tree[parent].add(child);
+			parents[child]=parent;
+		}
+		int root=0;
+		for(int i=1;i<=n;i++)
+		{
+			if(parents[i]==0)
+			{
+				root=i;
+				break;
+			}
+		}
+		
+		dfs(root);
+		
+		System.out.println(Math.max(dp[root][1],dp[root][0]));
+		
+	}
+		
+}
