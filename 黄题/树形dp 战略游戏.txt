@@ -1,0 +1,92 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main 
+{	
+	public static ArrayList<Integer>[] tree;
+	
+	public static int[][] dp;
+	
+	public static void dfs(int index)
+	{
+		//不存在越界问题哈 没节点了根本进不去for
+		dp[index][1]=1;
+		dp[index][0]=0;
+		
+		for(int child : tree[index])
+		{
+			dfs(child);//找到叶子节点先
+			
+			//如果选了当前节点 那么跟他接轨的子节点全部可选可不选 因为边已经激活了
+			dp[index][1]+=Math.min(dp[child][1],dp[child][0]);
+			
+			//反之则必须选
+			dp[index][0]+=dp[child][1];
+		}
+	}
+	
+	
+	
+	
+	public static void main(String[] args) throws IOException
+	{
+		BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer tokenizer=new StringTokenizer(reader.readLine());
+		int n=Integer.parseInt(tokenizer.nextToken());
+		tree=new ArrayList[n+1];
+		dp=new int[n+1][2];
+		int[] parent=new int[n+1];
+		int root=-1;
+		for(int i=0;i<n;i++)
+		{
+			parent[i]=i;
+			tree[i]=new ArrayList<>();
+		}
+		for(int i=0;i<n;i++)
+		{
+			StringTokenizer t=new StringTokenizer(reader.readLine());
+			int number=Integer.parseInt(t.nextToken());
+			int k=Integer.parseInt(t.nextToken());
+			for(int j=0;j<k;j++)
+			{
+				int child=Integer.parseInt(t.nextToken());
+				tree[number].add(child);
+				parent[child]=number;
+			}	
+		}
+		for(int i=0;i<n;i++)
+		{
+			if(parent[i]==i)
+			{
+				root=i;
+				break;
+			}
+		}
+		dfs(root);
+		System.out.println(Math.min(dp[root][0],dp[root][1]));
+	}
+		
+}
